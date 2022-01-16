@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Generic, Type, overload, Tuple, Any, Optional, Union, TypeVar
+from typing import Generic, Type, overload, Tuple, Any, Optional, Union, TypeVar, Callable
 
 from magiqt.field.range import IntRange, AnyRange, FloatRange
 from magiqt.field.validator import IntValidator, AnyValidator, FloatValidator
@@ -15,6 +15,7 @@ from magiqt.interface import (
 )
 from magiqt.widgets.label import Label
 from magiqt.widgets.input.line_edit import LineEdit
+from magiqt.widgets.group_box import GroupBox
 
 
 _Field = TypeVar("_Field", bound="FieldBase[Any, Any]")
@@ -28,17 +29,27 @@ class FieldBase(Declaration[_Converted], Generic[_Value, _Converted]):
     read_only: bool = False
 
     def create_widgets(self, this_node: DeclarationItem) -> Tuple[Label, LineEdit[_Value, _Converted]]:
-        parent = this_node.parent.widgets[0] if this_node.parent else None
+        parent: Optional[GroupBox]
+        parent = this_node.parent.widgets[0] if this_node.parent else None  # type: ignore
         label = Label(f"{self.name}:", parent)
         line_edit = LineEdit(self, parent)
-        line_edit.textEdited.connect(lambda txt, p=parent: p.changed.emit(self.attribute_name))
+        if parent is not None:
+            line_edit.textEdited.connect(self._changed(parent))
         return label, line_edit
+
+    def _changed(self, parent: GroupBox) -> Callable[[str], None]:
+        attr = self.attribute_name
+
+        def _inner(text: str) -> None:
+            parent.changed.emit(attr)
+
+        return _inner
 
     def associated_widgets(self, instance: DeclaredContainer) -> Tuple[Label, LineEdit[_Value, _Converted]]:
         node = instance.node
         return node.children[self.attribute_name].widgets  # type: ignore
 
-    @overload
+    @overload  # type: ignore
     def __get__(
         self: FieldBase[_Value, _Converted], instance: None, owner: Type[DeclaredContainer]
     ) -> FieldBase[_Value, _Converted]:
