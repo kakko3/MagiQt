@@ -2,6 +2,12 @@
 requires = ["setuptools>=42.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[tool.pytest.ini_options]
+addopts = "--cov=magiqt"
+testpaths = [
+    "tests",
+]
+
 [tool.pylint.master]
 ignore = 'tests'
 
@@ -13,6 +19,7 @@ extension-pkg-allow-list=['PyQt5', 'PyQt5.QtCore']
 max-line-length = 120
 
 [tool.black]
+black_path = "src"
 target-version = ['py27','py36', 'py37', 'py38']
 line-length = 120
 
