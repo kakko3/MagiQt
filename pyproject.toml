@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=42.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.pylint.master]
+ignore = 'tests'
+
+[tool.pylint."MESSAGES CONTROL"]
+disable = ['C0114', 'C0115', 'C0116']
+extension-pkg-allow-list=['PyQt5', 'PyQt5.QtCore']
+
+[tool.pylint.format]
+max-line-length = 120
+
+[tool.black]
+target-version = ['py27','py36', 'py37', 'py38']
+line-length = 120
+
+[tool.mypy]
+strict = "True"

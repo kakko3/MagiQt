@@ -1,0 +1,5 @@
+pytest>=6.0
+mypy>=0.910
+tox>=3.24
+black>=21.12
+pylint>=2.12.2
