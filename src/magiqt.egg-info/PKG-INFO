@@ -1,0 +1,20 @@
+Metadata-Version: 2.1
+Name: magiqt
+Version: 0.0.1
+Summary: Declarative Qt interface
+Home-page: UNKNOWN
+Author: Markku Kakko
+License: MIT
+Platform: unix
+Platform: linux
+Platform: osx
+Platform: cygwin
+Platform: win32
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Requires-Python: >=3.8
+Provides-Extra: testing
+License-File: LICENSE
+
+UNKNOWN
+

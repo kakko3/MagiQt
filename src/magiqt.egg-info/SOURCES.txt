@@ -1,0 +1,15 @@
+LICENSE
+pyproject.toml
+setup.cfg
+setup.py
+src/magiqt/__init__.py
+src/magiqt/application.py
+src/magiqt/interface.py
+src/magiqt/main.py
+src/magiqt/py.typed
+src/magiqt.egg-info/PKG-INFO
+src/magiqt.egg-info/SOURCES.txt
+src/magiqt.egg-info/dependency_links.txt
+src/magiqt.egg-info/not-zip-safe
+src/magiqt.egg-info/requires.txt
+src/magiqt.egg-info/top_level.txt
