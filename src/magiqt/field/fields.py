@@ -2,8 +2,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Generic, Type, overload, Tuple, Any, Optional, Union, TypeVar, Callable
 
-from magiqt.field.range import IntRange, AnyRange, FloatRange
-from magiqt.field.validator import IntValidator, AnyValidator, FloatValidator
+from magiqt.field.range import IntRange, AnyRange, FloatRange, ItemRange, ListRange
+from magiqt.field.validator import IntValidator, AnyValidator, FloatValidator, ItemRangeValidator
 from magiqt.interface import (
     Validator,
     Range,
@@ -13,6 +13,8 @@ from magiqt.interface import (
     _Converted,
     DeclarationItem,
 )
+from magiqt.widgets.input.abstract import InputWidget
+from magiqt.widgets.input.combo_box import ComboBox
 from magiqt.widgets.label import Label
 from magiqt.widgets.input.line_edit import LineEdit
 from magiqt.widgets.group_box import GroupBox
@@ -29,12 +31,12 @@ class FieldBase(Declaration[_Converted], Generic[_Value, _Converted]):
     read_only: bool = False
 
     def create_widgets(self, this_node: DeclarationItem) -> Tuple[Label, LineEdit[_Value, _Converted]]:
-        parent: Optional[GroupBox]
-        parent = this_node.parent.widgets[0] if this_node.parent else None  # type: ignore
+        if this_node.parent is None:
+            raise ValueError(f"Cannot add to a node without parent {this_node}")
+        parent: GroupBox = this_node.parent.widgets[0]  # type: ignore
         label = Label(f"{self.name}:", parent)
         line_edit = LineEdit(self, parent)
-        if parent is not None:
-            line_edit.textEdited.connect(self._changed(parent))
+        line_edit.textEdited.connect(self._changed(parent))
         return label, line_edit
 
     def _changed(self, parent: GroupBox) -> Callable[[str], None]:
@@ -92,3 +94,18 @@ class IntegerField(FieldBase[int, int]):
 class FloatField(FieldBase[float, float]):
     validator: Type[Validator[float, float]] = FloatValidator
     range: FloatRange = FloatRange()
+
+
+@dataclass
+class DropDown(FieldBase[str, _Converted]):
+    validator: ItemRangeValidator[_Converted] = ItemRangeValidator  # type: ignore
+    range: ItemRange[_Converted] = ListRange(("",))  # type: ignore
+
+    def create_widgets(self, this_node: DeclarationItem) -> Tuple[Label, ComboBox[str, _Converted]]:  # type: ignore
+        if this_node.parent is None:
+            raise ValueError(f"Cannot add to a node without parent {this_node}")
+        parent: GroupBox = this_node.parent.widgets[0]  # type: ignore
+        label = Label(f"{self.name}:", parent)
+        combo = ComboBox(self, parent)
+        combo.currentIndexChanged.connect(self._changed(parent))
+        return label, combo

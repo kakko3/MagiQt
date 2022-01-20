@@ -1,7 +1,8 @@
 import locale
 from typing import Optional
 
-from magiqt.interface import Validator
+from magiqt.field.range import ItemRange
+from magiqt.interface import Validator, _Converted, _Value
 
 SYSTEM_SEPARATOR = str(locale.localeconv()["decimal_point"])
 INVALID_SEPARATOR = "," if SYSTEM_SEPARATOR == "." else "."
@@ -42,3 +43,15 @@ class IntValidator(Validator[int, int]):
 
     def mapped_to_range(self, value: int) -> int:
         return value
+
+
+class ItemRangeValidator(Validator[str, _Converted]):
+    range: ItemRange[_Converted]
+
+    def validated(self, value: str) -> Optional[_Value]:
+        if value in self.range:
+            return value  # type: ignore
+        return None
+
+    def mapped_to_range(self, value: str) -> _Converted:
+        return self.range.to_range_item(value)

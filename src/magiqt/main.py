@@ -3,7 +3,7 @@ from __future__ import annotations
 from magiqt.application import Application
 from magiqt.interface import DeclaredContainer
 from magiqt.layout_manager.form import Form
-from magiqt.field.fields import IntegerField, FloatField, StringField
+from magiqt.field.fields import IntegerField, FloatField, StringField, DropDown
 from magiqt.field.range import ListRange
 
 
@@ -22,6 +22,7 @@ class SubForm(Form):
 class TestForm(Form):
     name = StringField("Name")
     mass = FloatField("Mass")
+    combo = DropDown("Dropdown", range=ListRange(["test1", "test2", "test3"]))
     price = FloatField("Price")
     config = SubForm("Configuration")
     config2 = SubForm("Configuration 2")
@@ -39,7 +40,8 @@ if __name__ == "__main__":
     form.price = 2000
     form.config.pipes = 100
     form.config.employee.number = 199
-    config = form.config
+    config = form.config2
+    config.pipes = 300
     print(form.as_dict())
     form.show()
     APP.exec()

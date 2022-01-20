@@ -17,13 +17,14 @@ from magiqt.interface import (
     Range,
     IsEditable,
 )
+from magiqt.widgets.input.abstract import InputWidget
 from magiqt.widgets.input.wrappers import QtCompleterWrapper, QtValidatorWrapper
 
 if TYPE_CHECKING:
     from magiqt.field.fields import FieldBase
 
 
-class LineEdit(QLineEdit, IsEditable[_Converted], Generic[_Value, _Converted]):  # pylint: disable=W0223
+class LineEdit(QLineEdit, InputWidget[_Value, _Converted], Generic[_Value, _Converted]):  # pylint: disable=W0223
     def __init__(self, field: FieldBase[_Value, _Converted], parent: Optional[QWidget] = None) -> None:
         super().__init__(parent)
         self.set_field(field)
@@ -33,14 +34,14 @@ class LineEdit(QLineEdit, IsEditable[_Converted], Generic[_Value, _Converted]): 
 
     def set_field(self, field: FieldBase[_Value, _Converted]) -> None:
         self.set_validator(field)
-        self.set_completer(field.range)
+        self.set_range(field.range)
         self.set_readonly(field.read_only)
 
     def set_validator(self, field: FieldBase[_Value, _Converted]) -> None:
         validator = field.validator(field.range)
         self.setValidator(QtValidatorWrapper(self, validator))
 
-    def set_completer(self, range_: Range[_Value, _Converted]) -> None:
+    def set_range(self, range_: Range[_Value, _Converted]) -> None:
         self.setCompleter(QtCompleterWrapper(self, range_))
 
     def set_readonly(self, state: bool) -> None:

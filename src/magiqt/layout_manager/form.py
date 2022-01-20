@@ -10,6 +10,7 @@ from typing import (
     NoReturn,
     Type,
     cast,
+    Callable,
 )
 
 from PyQt5.QtWidgets import QGridLayout, QWidget
@@ -39,13 +40,33 @@ class Form(DeclaredContainer):
         return instance
 
     def create_widgets(self, this_node: DeclarationItem) -> Tuple[GroupBox]:
-        parent_widget: Optional[QWidget]
-        parent_widget = this_node.parent.widgets[0] if this_node.parent else None
+        parent_node = this_node.parent
+        parent_widget: Optional[GroupBox] = parent_node.widgets[0] if parent_node else None  # type: ignore
         widget = GroupBox(self.title, parent_widget)
-        QGridLayout(widget)  # To bing this to widget
+        if parent_widget is not None:
+            widget.changed.connect(self._changed(parent_node))  # type: ignore
+        QGridLayout(widget)  # To bind this to widget
         this_node.widgets = (widget,)
         self._build_children(this_node)
         return (widget,)
+
+    def _changed(self, parent: DeclarationItem) -> Callable[[str], None]:
+        print(f"Connect {self.attribute_name} {id(self)} to {parent}")
+
+        def _inner(txt: str) -> None:
+            parent.widgets[0].changed.emit(self.attribute_name)
+
+        return _inner
+
+    def _on_change(self, attr: str, parent: DeclaredContainer) -> None:
+        if not self.on_change_pre_validate(attr, parent):
+            return None
+        if not self.is_valid(parent):
+            return None
+        if self.on_change(attr, parent):
+            widget = self.associated_widgets(parent)[0]
+            widget.changed.emit(attr)
+        return None
 
     def widget(self) -> GroupBox:
         return self.node.widgets[0]  # type: ignore

@@ -46,9 +46,12 @@ class ValidatorResult(Generic[_Converted]):
         return self.converted
 
 
-@dataclass  # type: ignore
+@dataclass(init=False)  # type: ignore
 class Validator(Generic[_Value, _Converted], metaclass=AbstractWithClassRepr):
-    range: Range[_Value, _Converted]
+    range_: Range[_Value, _Converted]
+
+    def __init__(self, range_: Range[_Value, _Converted]) -> None:
+        self.range = range_
 
     @abstractmethod
     def validated(self, value: str) -> Optional[_Value]:
@@ -127,7 +130,6 @@ class Declaration(ABC, Generic[_ReturnType]):
 
 
 class DeclaredContainer(Declaration["DeclaredContainer"], ABC):
-    backend_widget: QWidget
     node: DeclarationItem
 
     def widget(self) -> QWidget:
@@ -139,7 +141,8 @@ class DeclaredContainer(Declaration["DeclaredContainer"], ABC):
         if not self.is_valid(parent):
             return None
         if self.on_change(attr, parent):
-            self.backend_widget.changed.emit(attr)
+            widget = self.associated_widgets(parent)[0]
+            widget.changed.emit(attr)
         return None
 
     def is_valid(self, parent: Optional[DeclaredContainer]) -> bool:

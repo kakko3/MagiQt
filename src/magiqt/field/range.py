@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Sequence, Dict
+from typing import Sequence, Dict, Generic, Union
 
 from magiqt.interface import Range, _Converted
 
@@ -70,12 +70,38 @@ class IntRange(Range[int, int]):
         return False
 
 
+class ItemRange(Range[str, _Converted], Generic[_Converted]):
+    def __contains__(self, item: str) -> bool:
+        raise NotImplementedError
+
+    def __len__(self) -> int:
+        raise NotImplementedError
+
+    def to_range_item(self, item: str) -> _Converted:
+        raise NotImplementedError
+
+    def is_mapping(self) -> bool:
+        raise NotImplementedError
+
+    def gui_items(self) -> Sequence[str]:
+        raise NotImplementedError
+
+    def display_role(self, index: int) -> str:
+        raise NotImplementedError
+
+    def item(self, index: int) -> _Converted:
+        raise NotImplementedError
+
+
 @dataclass
-class ListRange(Range[str, str]):
+class ListRange(ItemRange[str]):
     _items: Sequence[str]
 
     def __contains__(self, item: str) -> bool:
         return item in self._items
+
+    def __len__(self) -> int:
+        return len(self._items)
 
     def to_range_item(self, item: str) -> str:
         return item
@@ -86,13 +112,22 @@ class ListRange(Range[str, str]):
     def gui_items(self) -> Sequence[str]:
         return self._items
 
+    def display_role(self, index: int) -> str:
+        return self._items[index]
+
+    def item(self, index: int) -> str:
+        return self.display_role(index)
+
 
 @dataclass
-class MappedRange(Range[str, _Converted]):
+class MappedRange(ItemRange[_Converted]):
     _items: Dict[str, _Converted]
 
     def __contains__(self, item: str) -> bool:
         return item in self._items
+
+    def __len__(self) -> int:
+        return len(self._items)
 
     def to_range_item(self, item: str) -> _Converted:
         return self._items[item]
@@ -102,3 +137,13 @@ class MappedRange(Range[str, _Converted]):
 
     def gui_items(self) -> Sequence[str]:
         return list(self._items.keys())
+
+    def _get_key(self, index: int) -> str:
+        listed = list(self._items.keys())
+        return listed[index]
+
+    def display_role(self, index: int) -> str:
+        return self._get_key(index)
+
+    def item(self, index: int) -> str:
+        return self._items[self._get_key(index)]

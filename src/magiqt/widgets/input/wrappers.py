@@ -1,10 +1,10 @@
 from __future__ import annotations
 from contextlib import contextmanager
-from typing import Optional, Iterator, Generic, Dict, Tuple, TYPE_CHECKING
+from typing import Optional, Iterator, Generic, Dict, Tuple, TYPE_CHECKING, Union
 
 from PyQt5.QtCore import Qt, QRect
 from PyQt5.QtGui import QValidator, QPalette, QColor
-from PyQt5.QtWidgets import QCompleter, QLineEdit
+from PyQt5.QtWidgets import QCompleter, QLineEdit, QComboBox
 
 from magiqt.interface import Range, _Value, _Converted, ValidatorResult, Validator
 
@@ -52,7 +52,7 @@ class QtValidatorWrapper(QValidator, Generic[_Value, _Converted]):
 
     def __init__(
         self,
-        parent: LineEdit[_Value, _Converted],
+        parent: Union[QLineEdit, QComboBox],
         validator: Validator[_Value, _Converted],
     ):
         super().__init__(parent)
