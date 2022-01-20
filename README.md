@@ -36,5 +36,4 @@ APP.exec()
 ````
 Produces
 
-![Example](https://github.com/kakko3/declarative_qt/examples/readme/example.png)
->>>>>>> readme
+![Example](https://github.com/kakko3/declarative_qt/blob/main/examples/readme/example.png)
