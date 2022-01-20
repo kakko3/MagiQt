@@ -32,6 +32,9 @@ class Form(DeclaredContainer):
     title: str
     node: DeclarationItem = field(init=False, repr=False)
 
+    def set_window_title(self, title: str) -> None:
+        self.widget().setWindowTitle(title)
+
     @classmethod
     def new_tree(cls: Type[_Form], title: str) -> _Form:
         instance = cls(title)
