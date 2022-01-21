@@ -132,29 +132,32 @@ class Declaration(ABC, Generic[_ReturnType]):
 class DeclaredContainer(Declaration["DeclaredContainer"], ABC):
     node: DeclarationItem
 
-    def widget(self) -> QWidget:
-        raise NotImplementedError
-
-    def _on_change(self, attr: str, parent: DeclaredContainer) -> None:
-        if not self.on_change_pre_validate(attr, parent):
+    def _on_change(self, attr: str, this_item: DeclarationItem) -> None:
+        if not self.on_change_pre_validate(attr, this_item):
             return None
-        if not self.is_valid(parent):
+        if not self.is_valid(this_item):
             return None
-        if self.on_change(attr, parent):
-            widget = self.associated_widgets(parent)[0]
+        if self.on_change(attr, this_item):
+            parent = this_item.parent
+            if parent is None:
+                return None
+            widget = parent.widgets[0]
             widget.changed.emit(attr)
         return None
 
-    def is_valid(self, parent: Optional[DeclaredContainer]) -> bool:
+    def widget(self) -> QWidget:
         raise NotImplementedError
 
-    def on_change(self, attr: str, parent: DeclaredContainer) -> bool:
+    def on_change(self, attr: str, this_item: DeclarationItem) -> bool:
         """Hook after validation. Return True to propagate"""
-        raise NotImplementedError
+        return True
 
-    def on_change_pre_validate(self, attr: str, parent: DeclaredContainer) -> bool:
+    def on_change_pre_validate(self, attr: str, this_item: DeclarationItem) -> bool:
         """Hook before validation. Return True to propagate"""
-        raise NotImplementedError
+        return True
+
+    def is_valid(self, this_item: DeclarationItem) -> bool:
+        return True
 
 
 class IsPlaceable:

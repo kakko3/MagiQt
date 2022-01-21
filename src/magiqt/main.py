@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from magiqt.application import Application
-from magiqt.interface import DeclaredContainer
+from magiqt.interface import DeclaredContainer, DeclarationItem
 from magiqt.layout_manager.form import Form
 from magiqt.field.fields import IntegerField, FloatField, StringField, DropDown
 from magiqt.field.range import ListRange
@@ -11,12 +11,20 @@ class SubSubForm(Form):
     number = IntegerField("Number")
     level = StringField("Professionalism", range=ListRange(["Pro", "Average", "Total failure"]))
 
+    def on_change(self, attr: str, this_node: DeclarationItem) -> bool:
+        print("SUBSUB CHANGE", attr)
+        return True
+
 
 class SubForm(Form):
     pipes = IntegerField("Pipes")
     welds = FloatField("Weld meters")
     hourly_rate = FloatField("Hourly rate")
     employee = SubSubForm("Employee")
+
+    def on_change(self, attr: str, this_node: DeclarationItem) -> bool:
+        print("SUB CHANGE", attr)
+        return True
 
 
 class TestForm(Form):
@@ -28,7 +36,7 @@ class TestForm(Form):
     config2 = SubForm("Configuration 2")
 
     def on_change(self, attr: str, parent: DeclaredContainer) -> bool:
-        print(attr)
+        print("TESTFORM CHANGE")
         return True
 
 

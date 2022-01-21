@@ -8,7 +8,7 @@ from PyQt5.QtCore import pyqtSignal, pyqtBoundSignal
 from magiqt.interface import IsPlaceable
 
 
-@dataclass
+@dataclass(repr=False)
 class GroupBox(QGroupBox, IsPlaceable):  # pylint: disable=W0223
     changed: Union[pyqtSignal, pyqtBoundSignal] = pyqtSignal(str)
 
@@ -23,3 +23,6 @@ class GroupBox(QGroupBox, IsPlaceable):  # pylint: disable=W0223
 
     def span(self) -> int:
         return 3
+
+    def __repr__(self) -> str:
+        return type(self).__name__

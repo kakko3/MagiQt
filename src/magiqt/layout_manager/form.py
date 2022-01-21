@@ -13,7 +13,7 @@ from typing import (
     Callable,
 )
 
-from PyQt5.QtWidgets import QGridLayout, QWidget
+from PyQt5.QtWidgets import QGridLayout
 
 from magiqt.interface import (
     DeclaredContainer,
@@ -40,36 +40,25 @@ class Form(DeclaredContainer):
         instance = cls(title)
         instance.node = DeclarationItem(instance)
         instance.create_widgets(instance.node)
+        instance.attribute_name = "__root__"
         return instance
 
     def create_widgets(self, this_node: DeclarationItem) -> Tuple[GroupBox]:
         parent_node = this_node.parent
         parent_widget: Optional[GroupBox] = parent_node.widgets[0] if parent_node else None  # type: ignore
         widget = GroupBox(self.title, parent_widget)
-        if parent_widget is not None:
-            widget.changed.connect(self._changed(parent_node))  # type: ignore
-        QGridLayout(widget)  # To bind this to widget
+        widget.changed.connect(self._changed(this_node))  # type: ignore
+        QGridLayout(widget)  # To bind layout to widget
         this_node.widgets = (widget,)
         self._build_children(this_node)
         return (widget,)
 
-    def _changed(self, parent: DeclarationItem) -> Callable[[str], None]:
-        print(f"Connect {self.attribute_name} {id(self)} to {parent}")
+    def _changed(self, this_item: DeclarationItem) -> Callable[[str], None]:
 
         def _inner(txt: str) -> None:
-            parent.widgets[0].changed.emit(self.attribute_name)
+            self._on_change(self.attribute_name, this_item)
 
         return _inner
-
-    def _on_change(self, attr: str, parent: DeclaredContainer) -> None:
-        if not self.on_change_pre_validate(attr, parent):
-            return None
-        if not self.is_valid(parent):
-            return None
-        if self.on_change(attr, parent):
-            widget = self.associated_widgets(parent)[0]
-            widget.changed.emit(attr)
-        return None
 
     def widget(self) -> GroupBox:
         return self.node.widgets[0]  # type: ignore
@@ -86,15 +75,15 @@ class Form(DeclaredContainer):
                 layout.addWidget(widget, line, column, 1, widget.span())
                 column += 1
 
-    def on_change(self, attr: str, parent: DeclaredContainer) -> bool:
+    def on_change(self, attr: str, this_item: DeclarationItem) -> bool:
         """Hook after validation. Return True to propagate"""
         return True
 
-    def on_change_pre_validate(self, attr: str, parent: DeclaredContainer) -> bool:
+    def on_change_pre_validate(self, attr: str, this_item: DeclarationItem) -> bool:
         """Hook before validation. Return True to propagate"""
         return True
 
-    def is_valid(self, parent: Optional[DeclaredContainer]) -> bool:
+    def is_valid(self, this_item: DeclarationItem) -> bool:
         return True
 
     def associated_widgets(self, instance: DeclaredContainer) -> Tuple[GroupBox]:
