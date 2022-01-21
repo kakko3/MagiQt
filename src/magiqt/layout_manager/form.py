@@ -36,26 +36,27 @@ class Form(DeclaredContainer):
         self.widget().setWindowTitle(title)
 
     @classmethod
-    def new_tree(cls: Type[_Form], title: str) -> _Form:
-        instance = cls(title)
+    def build(cls: Type[_Form], form_title: str, window_title: str = "") -> _Form:
+        instance = cls(form_title)
         instance.node = DeclarationItem(instance)
         instance.create_widgets(instance.node)
         instance.attribute_name = "__root__"
+        if window_title:
+            instance.widget().setWindowTitle(window_title)
         return instance
 
     def create_widgets(self, this_node: DeclarationItem) -> Tuple[GroupBox]:
         parent_node = this_node.parent
         parent_widget: Optional[GroupBox] = parent_node.widgets[0] if parent_node else None  # type: ignore
         widget = GroupBox(self.title, parent_widget)
-        widget.changed.connect(self._changed(this_node))  # type: ignore
+        widget.changed.connect(self._changed(this_node))
         QGridLayout(widget)  # To bind layout to widget
         this_node.widgets = (widget,)
         self._build_children(this_node)
         return (widget,)
 
     def _changed(self, this_item: DeclarationItem) -> Callable[[str], None]:
-
-        def _inner(txt: str) -> None:
+        def _inner(txt: str) -> None:  # pylint: disable=W0613
             self._on_change(self.attribute_name, this_item)
 
         return _inner

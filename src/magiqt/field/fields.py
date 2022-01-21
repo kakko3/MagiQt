@@ -13,11 +13,10 @@ from magiqt.interface import (
     _Converted,
     DeclarationItem,
 )
-from magiqt.widgets.input.abstract import InputWidget
-from magiqt.widgets.input.combo_box import ComboBox
 from magiqt.widgets.label import Label
-from magiqt.widgets.input.line_edit import LineEdit
 from magiqt.widgets.group_box import GroupBox
+from magiqt.widgets.input.line_edit import LineEdit
+from magiqt.widgets.input.combo_box import ComboBox
 
 
 _Field = TypeVar("_Field", bound="FieldBase[Any, Any]")
@@ -42,7 +41,7 @@ class FieldBase(Declaration[_Converted], Generic[_Value, _Converted]):
     def _changed(self, parent: GroupBox) -> Callable[[str], None]:
         attr = self.attribute_name
 
-        def _inner(text: str) -> None:
+        def _inner(text: str) -> None:  # pylint: disable=W0613
             parent.changed.emit(attr)
 
         return _inner

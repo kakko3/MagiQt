@@ -15,10 +15,10 @@ from magiqt.interface import (
     _Value,
     _Converted,
     Range,
-    IsEditable,
 )
 from magiqt.widgets.input.abstract import InputWidget
-from magiqt.widgets.input.wrappers import QtCompleterWrapper, QtValidatorWrapper
+from magiqt.widgets.input.wrappers import QtValidatorWrapper, QtCompleterWrapper
+
 
 if TYPE_CHECKING:
     from magiqt.field.fields import FieldBase
@@ -31,11 +31,6 @@ class LineEdit(QLineEdit, InputWidget[_Value, _Converted], Generic[_Value, _Conv
 
     def widget(self) -> LineEdit[_Value, _Converted]:
         return self
-
-    def set_field(self, field: FieldBase[_Value, _Converted]) -> None:
-        self.set_validator(field)
-        self.set_range(field.range)
-        self.set_readonly(field.read_only)
 
     def set_validator(self, field: FieldBase[_Value, _Converted]) -> None:
         validator = field.validator(field.range)

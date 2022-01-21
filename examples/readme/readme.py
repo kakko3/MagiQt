@@ -19,7 +19,7 @@ class MobilePhone(Form):
 
 if __name__ == "__main__":
     APP = Application()
-    WIDGET = MobilePhone.new_tree("MobilePhone")
+    WIDGET = MobilePhone.build("MobilePhone")
     WIDGET.set_window_title("Test GUI")
     WIDGET.show()
     APP.exec()

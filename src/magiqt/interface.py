@@ -150,21 +150,21 @@ class DeclaredContainer(Declaration["DeclaredContainer"], ABC):
 
     def on_change(self, attr: str, this_item: DeclarationItem) -> bool:
         """Hook after validation. Return True to propagate"""
-        return True
+        raise NotImplementedError
 
     def on_change_pre_validate(self, attr: str, this_item: DeclarationItem) -> bool:
         """Hook before validation. Return True to propagate"""
-        return True
+        raise NotImplementedError
 
     def is_valid(self, this_item: DeclarationItem) -> bool:
-        return True
-
-
-class IsPlaceable:
-    def span(self) -> int:
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def layout(self) -> QLayout:
+        return self.widget().layout()
+
+
+class IsPlaceable:  # pylint: disable=R0903
+    def span(self) -> int:
         raise NotImplementedError()
 
 

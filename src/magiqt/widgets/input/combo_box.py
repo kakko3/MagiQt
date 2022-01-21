@@ -1,10 +1,10 @@
 from __future__ import annotations
-from typing import Optional, Generic, TYPE_CHECKING, Union, Any
+from typing import Optional, Generic, TYPE_CHECKING, Union
 
-from PyQt5.QtCore import QModelIndex, QAbstractListModel, Qt, QAbstractItemModel
+from PyQt5.QtCore import QModelIndex, QAbstractListModel, Qt
 from PyQt5.QtWidgets import QComboBox, QWidget
 
-from magiqt.interface import _Converted, _Value, Validator, Range
+from magiqt.interface import _Converted, _Value, Validator
 from magiqt.widgets.input.abstract import InputWidget
 from magiqt.field.range import ItemRange
 from magiqt.widgets.input.wrappers import QtValidatorWrapper
@@ -18,17 +18,14 @@ class QtModelWrapper(QAbstractListModel, Generic[_Converted]):
         super().__init__(parent)
         self._range = range_
 
-    def data(self, index: QModelIndex, role: int = ...) -> Union[str, _Converted, None]:
+    def data(self, index: QModelIndex, role: int = -1) -> Union[str, _Converted, None]:
         return self._range.display_role(index.row()) if role == Qt.DisplayRole else None
 
-    def rowCount(self, parent: Optional[QModelIndex] = None) -> int:
+    def rowCount(self, parent: Optional[QModelIndex] = None) -> int:  # pylint: disable=W0613, C0103
         return len(self._range)
 
-    def columnCount(self, parent: QModelIndex = ...) -> int:
-        return 1
 
-
-class ComboBox(QComboBox, InputWidget[_Value, _Converted]):  # type: ignore
+class ComboBox(QComboBox, InputWidget[_Value, _Converted]):
     _validator: Validator[_Value, _Converted]
 
     def __init__(self, field: FieldBase[_Value, _Converted], parent: Optional[QWidget] = None) -> None:
@@ -38,18 +35,14 @@ class ComboBox(QComboBox, InputWidget[_Value, _Converted]):  # type: ignore
     def set_validator(self, field: FieldBase[_Value, _Converted]) -> None:
         self._validator = field.validator(field.range)
 
-    def set_range(self, range_: Range[_Value, _Converted]) -> None:
-        # Do not set
-        pass
+    def set_range(self, range_: ItemRange[_Converted]) -> None:  # type: ignore
+        self.setModel(QtModelWrapper(range_))
+
+    def set_readonly(self, state: bool) -> None:
+        self.setEnabled(not state)
 
     def validator(self) -> QtValidatorWrapper[_Value, _Converted]:
         return QtValidatorWrapper(self, self._validator)
-
-    def setReadOnly(self, state: bool) -> None:
-        self.setEnabled(not state)
-
-    def set_range(self, range_: ItemRange[_Converted]) -> None:  # type: ignore
-        self.setModel(QtModelWrapper(range_))
 
     def text(self) -> str:
         return self.currentText()

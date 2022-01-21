@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Sequence, Dict, Generic, Union
+from typing import Sequence, Dict, Generic
 
 from magiqt.interface import Range, _Converted
 
@@ -145,5 +145,5 @@ class MappedRange(ItemRange[_Converted]):
     def display_role(self, index: int) -> str:
         return self._get_key(index)
 
-    def item(self, index: int) -> str:
+    def item(self, index: int) -> _Converted:
         return self._items[self._get_key(index)]
